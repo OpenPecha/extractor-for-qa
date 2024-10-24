@@ -1,4 +1,4 @@
-from project_name.example import add_one
+from from_epub.example import add_one
 
 
 def test_add_one():
