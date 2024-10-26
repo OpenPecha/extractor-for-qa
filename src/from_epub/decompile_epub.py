@@ -18,7 +18,7 @@ def extract_epub(epub_path, output_dir):
 
 
 if __name__ == "__main__":
-    epub_file_path = 'data/Bod-Gangchen-Gyarab-Driwa-Drilen.epub'
-    output_directory = 'data/decompiled_epub/book2'
+    epub_file_path = 'data/docx/epub/output_file.epub'
+    output_directory = 'data/decompiled_epub/book3'
 
     extract_epub(epub_file_path, output_directory)

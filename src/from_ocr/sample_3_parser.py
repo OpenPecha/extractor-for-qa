@@ -1,51 +1,44 @@
-import os
 import re
 import json
 
-question_pattern = re.compile(r'(.+?)\s*ལན --')
-answer_pattern = re.compile(r'ལན --(.+?)(?=\n|$)', re.DOTALL)
+
+def clean_text(text):
+    text = re.sub(r'\d+', '', text)
+    text = text.replace('\n', '')
+    return text.strip()
 
 
-def extract_question_answer_pairs(text):
+def extract_questions_answers(filepath):
+    with open(filepath, 'r', encoding='utf-8') as file:
+        content = file.read()
+    sections = re.split(r'ལན\s*--', content)
 
-    pairs = []
-    answer_sections = re.split(answer_pattern, text)
+    qa_pairs = []
 
-    for i in range(0, len(answer_sections) - 1, 2):
-        question_match = answer_sections[i].strip()
-        answer_match = answer_sections[i + 1].strip()
+    for i in range(1, len(sections)):
+        question = clean_text(sections[i-1].strip())
+        answer = clean_text(sections[i].strip())
+        qa_pairs.append({
+            "question": question,
+            "answer": answer
+        })
 
-        if question_match and answer_match:
-            pairs.append({
-                "question": question_match,
-                "answer": answer_match
-            })
-
-    return pairs
+    return qa_pairs
 
 
-def process_txt_files(input_dir, output_json_path):
-    all_pairs = []
-    for filename in os.listdir(input_dir):
-        if filename.endswith('.txt'):
-            file_path = os.path.join(input_dir, filename)
-            with open(file_path, 'r', encoding='utf-8') as file:
-                text = file.read()
-                pairs = extract_question_answer_pairs(text)
-                all_pairs.extend(pairs)
-
-    with open(output_json_path, 'w', encoding='utf-8') as json_file:
-        json.dump(all_pairs, json_file, ensure_ascii=False, indent=4)
-
-    print(f"Extracted {len(all_pairs)} question-answer pairs and saved to {output_json_path}")
+def save_to_json(qa_pairs, output_filepath):
+    with open(output_filepath, 'w', encoding='utf-8') as json_file:
+        json.dump(qa_pairs, json_file, ensure_ascii=False, indent=4)
 
 
 def main():
-    input_dir = 'data/ocr/books/sample_3'
-    output_json_path = 'data/ocr/output_q&a_pair/sample_3_questions_answers.json'
+    input_txt = 'data/ocr/books/sample_3/དྲི་བ་དྲིས་ལན་འགའ་ཞིག་ཕྱོགས་གཅིག་ཏུ་བཏུས་པ།.txt'
+    output_json = 'data/ocr/output_q&a_pair/sample_3_questions_answers.json'
 
-    process_txt_files(input_dir, output_json_path)
+    qa_pairs = extract_questions_answers(input_txt)
+    save_to_json(qa_pairs, output_json)
+    print(f"JSON file saved as {output_json}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
